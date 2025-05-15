@@ -12,3 +12,229 @@ Encoding: UTF-8
 
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
+------
+
+---
+format:
+  pdf:
+    fig-width: 6
+    fig-height: 6
+pdf-engine:
+  lualatex
+execute:
+  echo: false
+  warning: false
+
+# "echo: false" above means block code will not be shown (for all blocks)
+# "fig-height:6 " and "fig-width: 6" set the default figure dimensions to 6inx6in
+# default settings can be overridden per block
+# LEAVE THIS COMMENT AND EVERYTHING ABOVE !!!
+---
+
+---
+title: "Assignment 9"
+author: "Tyler Schultz"
+---
+
+```{r}
+#|label: Colors
+#|eval: true
+
+
+
+```
+
+# OPS Leaders, Last 4 weeks.
+
+## Across MLB
+
+```{r}
+#| echo: false
+#| eval: true
+
+library(tidyverse)
+library(baseballr)
+library(rsconnect)
+library(kableExtra)
+
+today <- Sys.Date()
+week_from <- floor_date(today, "week") - weeks(1)
+month_from <- floor_date(today, "week") - weeks(4)
+
+# Format for API
+today_fmt <- format(today, "%Y-%m-%d")
+month_from_fmt <- format(month_from, "%Y-%m-%d")
+week_from_fmt <- format(week_from, "%Y%m-%d")
+
+leaderboard <- bref_daily_batter(month_from_fmt, today_fmt)
+
+leaderboard |>
+  arrange(desc(OPS)) |>
+  filter(PA >= 70) |> 
+  select(Name, Team, PA, R, H, HR, RBI, SB, BA, OBP, SLG, OPS) |>
+  head(10) |>
+  knitr::kable()
+```
+
+\newpage
+
+# OPS Leaders, Last 4 weeks.
+
+## Across NL.
+
+```{r}
+#| echo: false
+#| eval: true
+
+library(tidyverse)
+library(baseballr)
+library(rsconnect)
+library(kableExtra)
+
+today <- Sys.Date()
+week_from <- floor_date(today, "week") - weeks(1)
+month_from <- floor_date(today, "week") - weeks(4)
+
+# Format for API
+today_fmt <- format(today, "%Y-%m-%d")
+month_from_fmt <- format(month_from, "%Y-%m-%d")
+week_from_fmt <- format(week_from, "%Y%m-%d")
+
+leaderboard <- bref_daily_batter(month_from_fmt, today_fmt)
+
+leaderboard |>
+  arrange(desc(OPS)) |>
+  filter(PA >= 70) |>
+  filter(Level == 'Maj-NL') |>
+  select(Name, Team, PA, R, H, HR, RBI, SB, BA, OBP, SLG, OPS) |>
+  head(10) |>
+  knitr::kable()
+```
+
+\newpage
+
+# OPS Leaders, Last 4 weeks.
+
+## Across AL.
+
+```{r}
+#| echo: false
+#| eval: true
+
+library(tidyverse)
+library(baseballr)
+library(rsconnect)
+library(kableExtra)
+
+today <- Sys.Date()
+week_from <- floor_date(today, "week") - weeks(1)
+month_from <- floor_date(today, "week") - weeks(4)
+
+# Format for API
+today_fmt <- format(today, "%Y-%m-%d")
+month_from_fmt <- format(month_from, "%Y-%m-%d")
+week_from_fmt <- format(week_from, "%Y%m-%d")
+
+leaderboard <- bref_daily_batter(month_from_fmt, today_fmt)
+
+leaderboard |>
+  arrange(desc(OPS)) |>
+  filter(PA >= 70) |>
+  filter(Level == 'Maj-AL') |>
+  select(Name, Team, PA, R, H, HR, RBI, SB, BA, OBP, SLG, OPS) |>
+  head(10) |>
+  knitr::kable()
+```
+
+
+```{r}
+#| echo: false
+#| eval: false
+
+library(tidyverse)
+library(baseballr)
+library(rsconnect)
+library(kableExtra)
+
+#pulls a sequence of dates from March 27, 2025 to the current date.
+dates_from_season <- seq(as.Date("2025-03-27"), Sys.Date(), by = "days")
+
+playername_rolling <- as.character(readline(prompt="Enter the player name: "))
+
+rolling_obp <- function(playername_rolling) {
+  bref_daily_batter(Sys.Date(), dates_from_season + 1) |>
+    filter(Name = playername_rolling) |>
+    array(OPS)
+}
+
+
+
+rolling_obp_result <- 
+  for(i in 1:length(dates_from_season)) {
+    result[i] <- rolling_obp(dates_from_season[i])
+  }
+
+```
+
+```{r}
+#|label: Cleanup
+#|eval: true
+#|echo: false
+
+
+
+```
+
+---
+# LEAVE THIS COMMENT BLOCK AND EVERYTHING BELOW !!!
+---
+
+\newpage
+
+# CODE APPENDIX
+
+```{r}
+#| label: get_labels
+#| echo: false
+#| include: true
+  
+  # DO NOT REMOVE THIS BLOCK !!!
+
+  # This block gets all the block labels except for the setup and appendix blocks (and its own)
+  # It also adds a blank line to the end of each code block
+  
+  block_labels <- setdiff(knitr::all_labels(), c("global_options", "get_labels", "code_appendix"))
+  if(length(block_labels) > 0){
+    local({
+      if(grepl("unnamed-chunk-", block_labels[1])){
+        source_code <- c("# ----", "", knitr::knit_code$get(block_labels[1]))
+      } else {
+        source_code <- c(paste0("# ---- ", block_labels[1]), "", knitr::knit_code$get(block_labels[1]))
+      }
+      eval(parse(text = paste0('knitr::knit_code$set("', block_labels[1], '"= source_code)')))
+    })
+    for(label in block_labels[-1]){
+      local({
+        if(grepl("unnamed-chunk-", label)){
+          source_code <- c("", "# ----", "", knitr::knit_code$get(label))
+        } else {
+          source_code <- c("", paste0("# ---- ", label), "", knitr::knit_code$get(label))
+        }
+        eval(parse(text = paste0('knitr::knit_code$set("', label, '"= source_code)')))
+      })
+    }
+  }
+
+```
+
+```{r ref.label = block_labels}
+#| label: code_appendix
+#| echo: true
+#| eval: false
+#| class-output: "shadebox"
+
+  # DO NOT REMOVE THIS BLOCK !!!
+
+  # This is the block for the code appendix
+
+```
