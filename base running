@@ -1,0 +1,82 @@
+# token 
+
+#expected runs per 24 situations
+expected_runs <- data.frame(
+  runners_on = c('---', '1--', '-2-', '12-', '--3', '1-3', '-23', '123'),
+  Zero_Outs = c('0.481', '0.859', '1.100', '1.437', '1.350', '1.784', '1.964', '2.292'),
+  One_Out = c('0.254', '0.509', '0.664', '0.884', '0.950', '1.130', '1.376', '1.541'),
+  Two_Outs = c('0.098', '0.224', '0.319', '0.429', '0.353', '0.478', '0.580', '0.752')
+)
+
+#probability of +1 run(s) per 24 situations
+prob_of_run <- data.frame(
+  runners_on = c('---', '1--', '-2-', '12-', '--3', '1-3', '-23', '123'),
+  Zero_Outs = c('0.268', '0.416', '0.614', '0.610', '0.843', '0.860', '0.852', '0.861'),
+  One_Out = c('0.155', '0.265', '0.397', '0.406', '0.660', '0.634', '0.676', '0.657'),
+  Two_Outs = c('0.067', '0.127', '0.216', '0.222', '0.257', '0.270', '0.260', '0.316')
+)
+
+#expected runs after steal attempt; runner on first
+steal_second <- data.frame(
+  outs = c('0', '1', '2'),
+  ER_stay = c(expected_runs[2,2], expected_runs[2,3], expected_runs[2,4]),
+  ER_Success = c(expected_runs[3,2], expected_runs[3,3], expected_runs[3,4]),
+  ER_Fail = c(expected_runs[1,3], expected_runs[1,4], '0')
+)
+
+steal_second <- steal_second |>
+  mutate(
+    ER_Fail = as.numeric(ER_Fail),
+    ER_Success = as.numeric(ER_Success),
+    ER_stay = as.numeric(ER_stay)
+  )
+
+runner_on_first <- steal_second |>
+  mutate(
+    min_sus_rate = (ER_stay - ER_Fail) / (ER_Success - ER_Fail)
+  )
+
+
+#prob of +1 runs after steal attempt; runner on first
+prob_second <- data.frame(
+  outs = c('0', '1', '2'),
+  ER_stay = c(prob_of_run[2,2], prob_of_run[2,3], prob_of_run[2,4]),
+  ER_Success = c(prob_of_run[3,2], prob_of_run[3,3], prob_of_run[3,4]),
+  ER_Fail = c(prob_of_run[1,3], prob_of_run[1,4], '0')
+)
+
+prob_second <- prob_second |>
+  mutate(
+    ER_Fail = as.numeric(ER_Fail),
+    ER_Success = as.numeric(ER_Success),
+    ER_stay = as.numeric(ER_stay)
+  )
+
+prob_second <- prob_second |>
+  mutate(
+    min_sus_rate = (ER_stay - ER_Fail) / (ER_Success - ER_Fail)
+  )
+
+
+#prob of +1 runs after advancing home; runner on third going home, runner on first
+third_to_home_single <- data.frame(
+  outs = c('0', '1', '2'),
+  ER_stay = c(prob_of_run[6,2], prob_of_run[6,3], prob_of_run[6,4]),
+  ER_Success = c('1.000', '1.000', '1.000'),
+  ER_Fail = c(prob_of_run[2,3], prob_of_run[2,4], '0')
+)
+
+third_to_home_single <- third_to_home_single |>
+  mutate(
+    ER_Fail = as.numeric(ER_Fail),
+    ER_Success = as.numeric(ER_Success),
+    ER_stay = as.numeric(ER_stay)
+  )
+
+third_to_home_single <- third_to_home_single |>
+  mutate(
+    min_sus_rate = (ER_stay - ER_Fail) / (ER_Success - ER_Fail)
+  )
+
+
+#prob of 1+ runs after 
